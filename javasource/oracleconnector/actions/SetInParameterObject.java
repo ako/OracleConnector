@@ -34,7 +34,6 @@ public class SetInParameterObject extends CustomJavaAction<java.lang.Boolean>
 	public java.lang.Boolean executeAction() throws Exception
 	{
 		// BEGIN USER CODE
-		//throw new com.mendix.systemwideinterfaces.MendixRuntimeException("Java action was not implemented");
 		connector.setInParameterObject(this.ObjectValue,this.SqlType);
 		return true;
 		// END USER CODE
@@ -50,7 +49,7 @@ public class SetInParameterObject extends CustomJavaAction<java.lang.Boolean>
 	}
 
 	// BEGIN EXTRA CODE
-	private final ILogNode logNode = Core.getLogger(this.getClass().getName());
+	private final ILogNode logNode = Core.getLogger(JdbcConnector.LOGNAME);
 	private final JdbcConnector connector = new JdbcConnector(logNode);
 
 	// END EXTRA CODE

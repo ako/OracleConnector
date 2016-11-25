@@ -16,13 +16,12 @@ import java.util.List;
 /**
  * Created by ako on 23-11-2016.
  */
-public class SqlInParameterRefCursor extends SqlParameter {
+public class SqlParameterRefCursor extends SqlParameter {
     private String entityName = null;
     private List<IMendixObject> objectListResult;
 
 
-    public SqlInParameterRefCursor(int index, String parameterDirection, String entityName) {
-
+    public SqlParameterRefCursor(int index, String parameterDirection, String entityName) {
         super();
         setParameterIndex(index);
         setParameterDirection(parameterDirection);
@@ -31,7 +30,7 @@ public class SqlInParameterRefCursor extends SqlParameter {
 
     @Override
     public void prepareCall(IContext context, CallableStatement callableStatement) throws SQLException {
-        logNode.info("prepareCall");
+        logNode.info("Ref cursor prepareCall");
         if (isInParameter()) {
             throw new MendixRuntimeException("Ref cursor in parameters are not supported");
         } else {
@@ -41,24 +40,20 @@ public class SqlInParameterRefCursor extends SqlParameter {
 
     @Override
     public void retrieveResult(IContext context, CallableStatement callableStatement) throws SQLException {
-        logNode.info("retrieveResult: " + getParameterIndex());
+        logNode.info("Ref cursor retrieveResult: " + getParameterIndex());
         if (isOutParameter()) {
-                                    /*
-                         * get cursor value
-                         */
             OracleCallableStatement oraCallableStatement = callableStatement.unwrap(OracleCallableStatement.class);
             ResultSet rs = oraCallableStatement.getCursor(getParameterIndex());
             int colCount = rs.getMetaData().getColumnCount();
             java.util.List<IMendixObject> resultList = new ArrayList<IMendixObject>();
             while (rs.next()) {
-                logNode.info("Result set record: " + rs);
-                //IMendixObject obj = objectInstantiator.instantiate(context, outPar.getEntityName());
+                logNode.trace("Result set record: " + rs);
                 IMendixObject obj = Core.instantiate(context, getEntityName());
                 for (int c = 1; c <= colCount; c++) {
                     String colName = rs.getMetaData().getColumnName(c);
                     int colType = rs.getMetaData().getColumnType(c);
                     String colTypeName = rs.getMetaData().getColumnTypeName(c);
-                    logNode.info(String.format("cursor col: %d, %s, %d, %s", c, colName, colType, colTypeName));
+                    logNode.trace(String.format("cursor col: %d, %s, %d, %s", c, colName, colType, colTypeName));
                     switch (colType) {
                         case OracleTypes.VARCHAR:
                             obj.setValue(context, colName, rs.getString(c));

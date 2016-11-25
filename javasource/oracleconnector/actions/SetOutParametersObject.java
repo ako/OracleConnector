@@ -46,7 +46,7 @@ public class SetOutParametersObject extends CustomJavaAction<java.lang.Boolean>
 	}
 
 	// BEGIN EXTRA CODE
-	private final ILogNode logNode = Core.getLogger(this.getClass().getName());
+	private final ILogNode logNode = Core.getLogger(JdbcConnector.LOGNAME);
 	private final JdbcConnector connector = new JdbcConnector(logNode);
 
 	// END EXTRA CODE

@@ -1,21 +1,16 @@
 package oracleconnector.impl;
 
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import com.mendix.systemwideinterfaces.core.meta.IMetaObject;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.function.Function;
 
-import com.mendix.systemwideinterfaces.core.meta.IMetaObject;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * ResultSetReader converts a given instance of {@link ResultSet} into a list of instances of Map<String, Object>, with key for column name

@@ -3,7 +3,6 @@ package oracleconnector.impl;
 
 import com.mendix.core.Core;
 import com.mendix.logging.ILogNode;
-
 import com.zaxxer.hikari.HikariDataSource;
 import oracleconnector.interfaces.ConnectionManager;
 

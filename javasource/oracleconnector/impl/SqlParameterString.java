@@ -9,12 +9,12 @@ import java.sql.SQLException;
 /**
  * Created by ako on 23-11-2016.
  */
-public class SqlInParameterString extends SqlInParameter {
+public class SqlParameterString extends SqlParameter {
 
     private String stringValue = null;
     private String stringResult = null;
 
-    public SqlInParameterString(int index, String parameterDirection, String stringValue) {
+    public SqlParameterString(int index, String parameterDirection, String stringValue) {
         super();
         setParameterType(super.STRING_TYPE);
         setParameterIndex(index);
@@ -22,7 +22,7 @@ public class SqlInParameterString extends SqlInParameter {
         setStringValue(stringValue);
     }
 
-    public SqlInParameterString(int index, String parameterDirection) {
+    public SqlParameterString(int index, String parameterDirection) {
         setParameterDirection(parameterDirection);
         setParameterIndex(index);
     }

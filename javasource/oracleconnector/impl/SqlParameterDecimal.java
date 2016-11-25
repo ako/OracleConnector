@@ -10,11 +10,11 @@ import java.sql.SQLException;
 /**
  * Created by ako on 23-11-2016.
  */
-public class SqlInParameterDecimal extends SqlParameter {
+public class SqlParameterDecimal extends SqlParameter {
     private BigDecimal decimalValue = null;
     private BigDecimal decimalResult = null;
 
-    public SqlInParameterDecimal(int index , String parameterDirection, BigDecimal decimalValue) {
+    public SqlParameterDecimal(int index, String parameterDirection, BigDecimal decimalValue) {
         super();
         setParameterType(super.DECIMAL_TYPE);
         setParameterIndex(index);
@@ -22,7 +22,7 @@ public class SqlInParameterDecimal extends SqlParameter {
         setDecimalValue(decimalValue);
     }
 
-    public SqlInParameterDecimal(int index, String parameterDirection) {
+    public SqlParameterDecimal(int index, String parameterDirection) {
         setParameterDirection(parameterDirection);
         setParameterIndex(index);
     }

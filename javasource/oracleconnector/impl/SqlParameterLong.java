@@ -9,19 +9,19 @@ import java.sql.SQLException;
 /**
  * Created by ako on 23-11-2016.
  */
-public class SqlInParameterLong extends SqlParameter {
+public class SqlParameterLong extends SqlParameter {
 
     private Long longValue = null;
     private Long longResult = null;
 
-    public SqlInParameterLong(int index, String parameterDirection, Long longValue) {
+    public SqlParameterLong(int index, String parameterDirection, Long longValue) {
         setParameterType(super.LONG_TYPE);
         setParameterIndex(index);
         setParameterDirection(parameterDirection);
         setLongValue(longValue);
     }
 
-    public SqlInParameterLong(int index, String parameterDirection) {
+    public SqlParameterLong(int index, String parameterDirection) {
         setParameterDirection(parameterDirection);
         setParameterIndex(index);
     }
@@ -51,6 +51,7 @@ public class SqlInParameterLong extends SqlParameter {
         logNode.info("getResultValue");
         return getLongResult();
     }
+
     public Long getLongValue() {
         return longValue;
     }

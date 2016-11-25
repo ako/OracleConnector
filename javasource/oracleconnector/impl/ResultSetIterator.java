@@ -1,22 +1,18 @@
 package oracleconnector.impl;
 
 
+import com.mendix.systemwideinterfaces.core.meta.IMetaObject;
+import com.mendix.systemwideinterfaces.core.meta.IMetaPrimitive;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import com.mendix.systemwideinterfaces.core.meta.IMetaObject;
-import com.mendix.systemwideinterfaces.core.meta.IMetaPrimitive;
 
 /**
  * ResultSetIterator implements {@link Iterator} interface. It wraps {@link ResultSet} into a stream for more convenient usage. Along

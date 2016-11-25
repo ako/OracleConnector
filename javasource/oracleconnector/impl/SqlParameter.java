@@ -21,7 +21,21 @@ public abstract class SqlParameter {
     public static final String DIRECTION_IN = "In";
     public static final String DIRECTION_OUT = "Out";
     public static final String DIRECTION_INOUT = "InOut";
-    public IContext context;
+    protected final ILogNode logNode = Core.getLogger(JdbcConnector.LOGNAME);
+    protected int parameterIndex;
+    private String sqlType;
+
+    //public IContext context;
+    private String parameterDirection = null;
+    private String parameterType = null;
+
+    public String getSqlType() {
+        return sqlType;
+    }
+
+    public void setSqlType(String sqlType) {
+        this.sqlType = sqlType;
+    }
 
     public String getParameterDirection() {
         return parameterDirection;
@@ -31,8 +45,6 @@ public abstract class SqlParameter {
         this.parameterDirection = parameterDirection;
     }
 
-    private String parameterDirection = null;
-
     public String getParameterType() {
         return parameterType;
     }
@@ -40,8 +52,6 @@ public abstract class SqlParameter {
     public void setParameterType(String parameterType) {
         this.parameterType = parameterType;
     }
-
-    private String parameterType = null;
 
     public boolean isStringParameter() {
         return parameterType.equals(STRING_TYPE);
@@ -77,8 +87,6 @@ public abstract class SqlParameter {
 
     abstract public <T extends Object> T getResultValue(Class<T> type) throws SQLException;
 
-    protected final ILogNode logNode = Core.getLogger(this.getClass().getName());
-
     public int getParameterIndex() {
         return parameterIndex;
     }
@@ -86,8 +94,6 @@ public abstract class SqlParameter {
     public void setParameterIndex(int parameterIndex) {
         this.parameterIndex = parameterIndex;
     }
-
-    protected int parameterIndex;
 
     public boolean isInParameter() {
         return parameterDirection.equals(DIRECTION_IN);

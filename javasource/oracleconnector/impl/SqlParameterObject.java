@@ -18,14 +18,14 @@ import java.util.List;
 /**
  * Created by ako on 23-11-2016.
  */
-public class SqlInParameterObject extends SqlParameter {
+public class SqlParameterObject extends SqlParameter {
 
     private String sqlTypeName = null;
     private String entityName = null;
     private IMendixObject objectValue;
 
 
-    public SqlInParameterObject(int index, String directionIn, IMendixObject objectValue, String sqlType) {
+    public SqlParameterObject(int index, String directionIn, IMendixObject objectValue, String sqlType) {
         super();
         setParameterIndex(index);
         setParameterDirection(directionIn);
@@ -33,7 +33,7 @@ public class SqlInParameterObject extends SqlParameter {
         setSqlTypeName(sqlType);
     }
 
-    public SqlInParameterObject(int index, String directionOut, String resultEntity, String sqlTypeName) {
+    public SqlParameterObject(int index, String directionOut, String resultEntity, String sqlTypeName) {
         super();
         setParameterIndex(index);
         setParameterDirection(directionOut);
@@ -67,17 +67,17 @@ public class SqlInParameterObject extends SqlParameter {
             for (int mxa = 0; mxa < structColumnCount; mxa++) {
                 //IMendixObjectMember mem = ((IMendixObjectMember) objects[mxa]);
                 String colName = structdesc.getMetaData().getColumnName(mxa + 1);
-                IMendixObjectMember mem = mxObj.getMember(this.context, colName);
+                IMendixObjectMember mem = mxObj.getMember(context, colName);
 //
                 logNode.info(String.format("getting attribute: %d, %s, %s", mxa,
-                        mem.getValue(this.context).getClass().getName(),
-                        mem.getValue(this.context)));
+                        mem.getValue(context).getClass().getName(),
+                        mem.getValue(context)));
 //
-                if (mem.getValue(this.context) instanceof java.util.Date) {
-                    attrVals[mxa] = new java.sql.Date(((Date) mem.getValue(this.context)).getTime());
+                if (mem.getValue(context) instanceof java.util.Date) {
+                    attrVals[mxa] = new java.sql.Date(((Date) mem.getValue(context)).getTime());
 //
                 } else {
-                    attrVals[mxa] = mem.getValue(this.context);
+                    attrVals[mxa] = mem.getValue(context);
 
                 }
             }
@@ -120,7 +120,7 @@ public class SqlInParameterObject extends SqlParameter {
             for (int sn = 0; sn < nameCount; sn++) {
                 String name = structdesc.getMetaData().getColumnName(sn + 1);
                 logNode.info(String.format("struct attr: %s, %s", name, values[sn]));
-                obj.setValue(this.context, name, values[sn]);
+                obj.setValue(context, name, values[sn]);
             }
             setObjectValue(obj);
 

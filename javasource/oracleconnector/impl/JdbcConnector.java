@@ -10,15 +10,14 @@ import com.mendix.systemwideinterfaces.core.meta.IMetaPrimitive.PrimitiveType;
 import oracle.jdbc.OracleCallableStatement;
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OracleTypes;
-import oracle.sql.StructDescriptor;
 import oracleconnector.interfaces.ConnectionManager;
 import oracleconnector.interfaces.ObjectInstantiator;
 
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -28,6 +27,8 @@ import java.util.stream.Stream;
  * JdbcConnector implements the execute query (and execute statement) functionality, and returns a {@link Stream} of {@link IMendixObject}s.
  */
 public class JdbcConnector {
+    public static final String LOGNAME = "OracleConnector";
+    static ThreadLocal<Map<Integer, SqlParameter>> nextParameters = new ThreadLocal<Map<Integer, SqlParameter>>();
     private final ILogNode logNode;
     private final ObjectInstantiator objectInstantiator;
     private final ConnectionManager connectionManager;
@@ -125,8 +126,6 @@ public class JdbcConnector {
                         "      r_vlines := r_vlines || '\n ' || v_counter || ', ' || L_lines(v_counter); \n" +
                         "   end loop; \n" +
                         "   :1 := r_lines; \n" +
-//                        "   --:1 := 'Fortuin!'; \n" +
-//                        "   --:1 := r_vlines; \n" +
                         "end;";
         logNode.info(sql);
         try (
@@ -139,7 +138,7 @@ public class JdbcConnector {
             dbmsLines = String.join("\n", lines);
             logNode.info("Lines: " + dbmsLines);
         } catch (Exception e) {
-            logNode.info("Dbms output get lines failed, probably no lines to read: " + e.getMessage());
+            logNode.trace("Dbms output get lines failed, probably no lines to read: " + e.getMessage());
         }
         return dbmsLines;
     }
@@ -150,7 +149,7 @@ public class JdbcConnector {
 
         try (Connection connection = connectionManager.getConnection(jdbcUrl, userName, password);
              CallableStatement callableStatement = connection.prepareCall(procedure)) {
-            logNode.info("parameter count: " + callableStatement.getParameterMetaData().getParameterCount());
+            logNode.trace("parameter count: " + callableStatement.getParameterMetaData().getParameterCount());
 
             int i = 0;
             Map<Integer, SqlParameter> parameters = nextParameters.get();
@@ -159,93 +158,8 @@ public class JdbcConnector {
             while (parIterator.hasNext()) {
                 i++;
                 SqlParameter sqlPar = parIterator.next();
-                logNode.info(String.format("Setting parameter: %d = %s", i, sqlPar));
-
+                logNode.trace(String.format("Setting parameter: %d = %s", i, sqlPar));
                 sqlPar.prepareCall(context, callableStatement);
-
-//                if (sqlPar instanceof SqlInParameter) {
-//                    /*
-//                     * Set in parameter
-//                     */
-//                    SqlInParameter inPar = (SqlInParameter) sqlPar;
-//                    if (sqlPar.isStringParameter()) {
-//                        callableStatement.setString(i, inPar.getStringValue());
-//                    } else if (sqlPar.isBooleanParameter()) {
-//                        callableStatement.setBoolean(i, inPar.getBooleanValue());
-//                    } else if (sqlPar.isDateTimeParameter()) {
-//                        callableStatement.setDate(i, new java.sql.Date(inPar.getDateTimeValue().getTime()));
-//                    } else if (sqlPar.isDecimalParameter()) {
-//                        callableStatement.setBigDecimal(i, inPar.getDecimalValue());
-//                    } else if (sqlPar.isLongParameter()) {
-//                        callableStatement.setLong(i, inPar.getLongValue());
-//                    } else if (sqlPar.isObjectParameter()) {
-//                        // Define a struct
-//                        IMendixObject mxObj = inPar.getMxObjectValue();
-//                        String sqlType = inPar.getSqlType();
-//                        logNode.info(String.format("Creating struct for %s, %s", mxObj, sqlType));
-//                        List<? extends IMendixObjectMember<?>> objPrimitives = mxObj.getPrimitives(context);
-//
-//                        StructDescriptor structdesc = StructDescriptor.createDescriptor
-//                                (inPar.getSqlType(), (OracleConnection) connection.unwrap(OracleConnection.class));
-//                        int structColumnCount = structdesc.getMetaData().getColumnCount();
-//                        int attributeCount = objPrimitives.size();
-//                        if (attributeCount != structColumnCount) {
-//                            logNode.warn(String.format("SQL object and entity have different attribute counts, %d != %d", structColumnCount, attributeCount));
-//                        }
-//                        logNode.info(String.format("attribute count %d", structColumnCount));
-//
-//                        Object[] attrVals = new Object[attributeCount];
-//                        Object[] objects = objPrimitives.toArray();
-//
-//                        for (int mxa = 0; mxa < structColumnCount; mxa++) {
-////                            IMendixObjectMember mem = ((IMendixObjectMember) objects[mxa]);
-//                            String colName = structdesc.getMetaData().getColumnName(mxa + 1);
-//                            IMendixObjectMember mem = mxObj.getMember(context, colName);
-//
-//                            logNode.info(String.format("getting attribute: %d, %s, %s", mxa,
-//                                    mem.getValue(context).getClass().getName(),
-//                                    mem.getValue(context)));
-//
-//                            if (mem.getValue(context) instanceof java.util.Date) {
-//                                attrVals[mxa] = new java.sql.Date(((Date) mem.getValue(context)).getTime());
-//
-//                            } else {
-//                                attrVals[mxa] = mem.getValue(context);
-//
-//                            }
-//                        }
-//                        logNode.info(String.format("Struct array: %s", Arrays.toString(attrVals)));
-//                        //Struct objStruct = connection.createStruct(sqlType, attrVals);
-//                        //callableStatement.setObject(i, objStruct);
-//                        OracleConnection oraConn = connection.unwrap(OracleConnection.class);
-//                        StructDescriptor itemDescriptor =
-//                                StructDescriptor.createDescriptor(sqlType, oraConn);
-//                        oracle.sql.STRUCT obj = new oracle.sql.STRUCT(itemDescriptor, oraConn, attrVals);
-//                        OracleCallableStatement oraStmt = callableStatement.unwrap(OracleCallableStatement.class);
-//                        oraStmt.setSTRUCT(i, obj);
-//                    }
-//                } else {
-//                    /*
-//                     * Register out parameter
-//                     */
-//                    SqlOutParameter outPar = (SqlOutParameter) sqlPar;
-//                    if (outPar.isStringParameter()) {
-//                        callableStatement.registerOutParameter(i, OracleTypes.VARCHAR);
-//                    } else if (outPar.isBooleanParameter()) {
-//                        // plsql boolean values are not supported in jdbc
-//                        callableStatement.registerOutParameter(i, OracleTypes.BOOLEAN);
-//                    } else if (outPar.isDateTimeParameter()) {
-//                        callableStatement.registerOutParameter(i, OracleTypes.DATE);
-//                    } else if (outPar.isDecimalParameter()) {
-//                        callableStatement.registerOutParameter(i, OracleTypes.DECIMAL);
-//                    } else if (outPar.isLongParameter()) {
-//                        callableStatement.registerOutParameter(i, OracleTypes.BIGINT);
-//                    } else if (outPar.isRefCursorParameter()) {
-//                        callableStatement.registerOutParameter(i, OracleTypes.CURSOR);
-//                    } else {
-//                        callableStatement.registerOutParameter(i, OracleTypes.STRUCT, outPar.getSqlTypeName().toUpperCase());
-//                    }
-//                }
             }
 
             logNode.trace("callableStatement: " + callableStatement.toString());
@@ -261,88 +175,7 @@ public class JdbcConnector {
                 j++;
                 SqlParameter sqlPar = outIterator.next();
                 sqlPar.retrieveResult(context, callableStatement);
-//                if (sqlPar instanceof SqlOutParameter) {
-//                    SqlOutParameter outPar = (SqlOutParameter) sqlPar;
-//                    logNode.info(String.format("Getting parameter: %s, %s", outPar, outPar.getParameterType()));
-//                    if (outPar.isStringParameter()) {
-//                        /*
-//                         * get string value
-//                         */
-//                        String stringValue = callableStatement.getString(j);
-//                        outPar.setStringValue(stringValue);
-//                        logNode.info("String value = " + stringValue);
-//                    } else if (outPar.isDateTimeParameter()) {
-//                        outPar.setDateTimeValue(callableStatement.getDate(j));
-//                    } else if (outPar.isLongParameter()) {
-//                        outPar.setLongValue(callableStatement.getLong(j));
-//                    } else if (outPar.isDecimalParameter()) {
-//                        outPar.setDecimalValue(callableStatement.getBigDecimal(j));
-//                    } else if (outPar.isObjectParameter()) {
-//
-//                        StructDescriptor structdesc = StructDescriptor.createDescriptor
-//                                (outPar.getSqlTypeName(), (OracleConnection) connection.unwrap(OracleConnection.class));
-//                        logNode.info(String.format("struct desc attr names: %s, %s", outPar.getSqlTypeName(), structdesc.getMetaData().getColumnName(1)));
-//
-//
-//                        oracle.sql.STRUCT sqlObj = (oracle.sql.STRUCT) callableStatement.getObject(j);
-//                        //AttributeDescriptor[] names = sqlObj.getDescriptor().getAttributesDescriptor();
-//                        int nameCount = structdesc.getMetaData().getColumnCount();
-//                        //logNode.info("names = " + Arrays.toString(names));
-//                        Object[] values = sqlObj.getAttributes();
-//                        logNode.info("Object: " + sqlObj);
-//                        IMendixObject obj = objectInstantiator.instantiate(context, outPar.getEntityName());
-//                        for (int sn = 0; sn < nameCount; sn++) {
-//                            String name = structdesc.getMetaData().getColumnName(sn + 1);
-//                            logNode.info(String.format("struct attr: %s, %s", name, values[sn]));
-//                            obj.setValue(context, name, values[sn]);
-//                        }
-//                        outPar.setObjectValue(obj);
-//                    } else if (outPar.isRefCursorParameter()) {
-//                        /*
-//                         * get cursor value
-//                         */
-//                        OracleCallableStatement oraCallableStatement = callableStatement.unwrap(OracleCallableStatement.class);
-//                        ResultSet rs = oraCallableStatement.getCursor(j);
-//                        int colCount = rs.getMetaData().getColumnCount();
-//                        java.util.List<IMendixObject> resultList = new ArrayList<IMendixObject>();
-//                        while (rs.next()) {
-//                            logNode.info("Result set record: " + rs);
-//                            IMendixObject obj = objectInstantiator.instantiate(context, outPar.getEntityName());
-//                            for (int c = 1; c <= colCount; c++) {
-//                                String colName = rs.getMetaData().getColumnName(c);
-//                                int colType = rs.getMetaData().getColumnType(c);
-//                                String colTypeName = rs.getMetaData().getColumnTypeName(c);
-//                                logNode.info(String.format("cursor col: %d, %s, %d, %s", c, colName, colType, colTypeName));
-//                                switch (colType) {
-//                                    case OracleTypes.VARCHAR:
-//                                        obj.setValue(context, colName, rs.getString(c));
-//                                        break;
-//                                    case OracleTypes.BIGINT:
-//                                        obj.setValue(context, colName, rs.getLong(c));
-//                                        break;
-//                                    case OracleTypes.INTEGER:
-//                                        obj.setValue(context, colName, rs.getInt(c));
-//                                        break;
-//                                    case OracleTypes.DECIMAL:
-//                                        obj.setValue(context, colName, rs.getBigDecimal(c));
-//                                        break;
-//                                    case OracleTypes.DATE:
-//                                        obj.setValue(context, colName, rs.getDate(c));
-//                                        break;
-//                                    default:
-//                                        obj.setValue(context, colName, rs.getObject(c));
-//                                }
-//                            }
-//                            resultList.add(obj);
-//                        }
-//                        outPar.setObjectListResult(resultList);
-//                        rs.close();
-//                    }
-//                }
             }
-            //OracleStruct struct = (OracleStruct) callableStatement.getObject(2);
-            //Object o = struct.getAttributes()[0];
-            //logNode.info("struct 0: " + o);
             return true;
         }
     }
@@ -350,21 +183,21 @@ public class JdbcConnector {
     public void setOutParameterObject(String resultEntity, String sqlTypeName) {
         logNode.info("setOutParameterObject");
         Map<Integer, SqlParameter> parameters = getParameters();
-        parameters.put(parameters.size() + 1, new SqlInParameterObject(parameters.size() + 1, SqlParameter.DIRECTION_OUT, resultEntity, sqlTypeName));
+        parameters.put(parameters.size() + 1, new SqlParameterObject(parameters.size() + 1, SqlParameter.DIRECTION_OUT, resultEntity, sqlTypeName));
 
     }
 
     public void setOutParameterString() {
         logNode.info("setOutParameterString");
         Map<Integer, SqlParameter> parameters = getParameters();
-        parameters.put(parameters.size() + 1, new SqlInParameterString(parameters.size() + 1, SqlParameter.DIRECTION_OUT));
+        parameters.put(parameters.size() + 1, new SqlParameterString(parameters.size() + 1, SqlParameter.DIRECTION_OUT));
 
     }
 
     public void setOutParameterRefCursor(String entityName) {
         logNode.info("setOutParameterRefCursor");
         Map<Integer, SqlParameter> parameters = getParameters();
-        SqlParameter outPar = new SqlInParameterRefCursor(parameters.size() + 1, SqlParameter.DIRECTION_OUT, entityName);
+        SqlParameter outPar = new SqlParameterRefCursor(parameters.size() + 1, SqlParameter.DIRECTION_OUT, entityName);
         parameters.put(parameters.size() + 1, outPar);
     }
 
@@ -375,14 +208,10 @@ public class JdbcConnector {
         nextParameters.set(parameters);
     }
 
-    static ThreadLocal<Map<Integer, SqlParameter>> nextParameters = new ThreadLocal<Map<Integer, SqlParameter>>();
-
     public String getStringParameter(Long parameterIndex) throws SQLException {
         logNode.info("getStringParameter: " + parameterIndex);
         Map<Integer, SqlParameter> parameters = nextParameters.get();
-        logNode.info("nextParameters: " + nextParameters);
         SqlParameter sqlPar = parameters.get(parameterIndex.intValue());
-        logNode.info("sqlPar: " + sqlPar);
         return sqlPar.getResultValue(String.class);
 
     }
@@ -391,7 +220,6 @@ public class JdbcConnector {
         logNode.info("getRefCursorParameter: " + parameterIndex);
         Map<Integer, SqlParameter> parameters = nextParameters.get();
         SqlParameter sqlPar = parameters.get(parameterIndex.intValue());
-        logNode.info("sqlPar: " + sqlPar);
         java.util.List<IMendixObject> objList = new java.util.ArrayList<IMendixObject>();
         return sqlPar.getResultValue(objList.getClass());
     }
@@ -399,25 +227,25 @@ public class JdbcConnector {
     public void setInParameterString(String stringValue) {
         logNode.info("setInParameterString");
         Map<Integer, SqlParameter> parameters = getParameters();
-        parameters.put(parameters.size() + 1, new SqlInParameterString(parameters.size() + 1, SqlParameter.DIRECTION_IN, stringValue));
+        parameters.put(parameters.size() + 1, new SqlParameterString(parameters.size() + 1, SqlParameter.DIRECTION_IN, stringValue));
     }
 
     public void setInParameterDecimal(BigDecimal decimalValue) {
         logNode.info("setInParameterDecimal");
         Map<Integer, SqlParameter> parameters = getParameters();
-        parameters.put(parameters.size() + 1, new SqlInParameterDecimal(parameters.size() + 1, SqlParameter.DIRECTION_IN, decimalValue));
+        parameters.put(parameters.size() + 1, new SqlParameterDecimal(parameters.size() + 1, SqlParameter.DIRECTION_IN, decimalValue));
     }
 
     public void setInParameterLong(Long longValue) {
         logNode.info("setInParameterLong");
         Map<Integer, SqlParameter> parameters = getParameters();
-        parameters.put(parameters.size() + 1, new SqlInParameterLong(parameters.size() + 1, SqlParameter.DIRECTION_IN, longValue));
+        parameters.put(parameters.size() + 1, new SqlParameterLong(parameters.size() + 1, SqlParameter.DIRECTION_IN, longValue));
     }
 
     public void setInParameterDateTime(Date dateTimeValue) {
         logNode.info("setInParameterDateTime");
         Map<Integer, SqlParameter> parameters = getParameters();
-        parameters.put(parameters.size() + 1, new SqlInParameterDateTime(parameters.size() + 1, SqlParameter.DIRECTION_IN, dateTimeValue));
+        parameters.put(parameters.size() + 1, new SqlParameterDateTime(parameters.size() + 1, SqlParameter.DIRECTION_IN, dateTimeValue));
 
     }
 
@@ -433,41 +261,41 @@ public class JdbcConnector {
     public void setOutParameterDate() {
         logNode.info("setOutParameterDate");
         Map<Integer, SqlParameter> parameters = getParameters();
-        parameters.put(parameters.size() + 1, new SqlInParameterDateTime(parameters.size() + 1, SqlParameter.DIRECTION_OUT));
+        parameters.put(parameters.size() + 1, new SqlParameterDateTime(parameters.size() + 1, SqlParameter.DIRECTION_OUT));
     }
 
     public void setOutParameterDecimal() {
         logNode.info("setOutParameterDecimal");
         Map<Integer, SqlParameter> parameters = getParameters();
-        parameters.put(parameters.size() + 1, new SqlInParameterDecimal(parameters.size() + 1, SqlParameter.DIRECTION_OUT));
+        parameters.put(parameters.size() + 1, new SqlParameterDecimal(parameters.size() + 1, SqlParameter.DIRECTION_OUT));
     }
 
     public void setOutParameterLong() {
         logNode.info("setOutParameterLong");
         Map<Integer, SqlParameter> parameters = getParameters();
-        parameters.put(parameters.size() + 1, new SqlInParameterLong(parameters.size() + 1, SqlParameter.DIRECTION_OUT));
+        parameters.put(parameters.size() + 1, new SqlParameterLong(parameters.size() + 1, SqlParameter.DIRECTION_OUT));
     }
 
     public Date getDateTimeParameterValue(Long parameterIndex) throws SQLException {
+        logNode.info("getDateTimeParameterValue");
         Map<Integer, SqlParameter> parameters = nextParameters.get();
         SqlParameter sqlPar = parameters.get(parameterIndex.intValue());
-        logNode.info("sqlPar: " + sqlPar);
         return sqlPar.getResultValue(Date.class);
 
     }
 
     public BigDecimal getDecimalParameterValue(Long parameterIndex) throws SQLException {
+        logNode.info("getDecimalParameterValue");
         Map<Integer, SqlParameter> parameters = nextParameters.get();
         SqlParameter sqlPar = parameters.get(parameterIndex.intValue());
-        logNode.info("sqlPar: " + sqlPar);
         return sqlPar.getResultValue(BigDecimal.class);
 
     }
 
     public Long getLongParameterValue(Long parameterIndex) throws SQLException {
+        logNode.info("getLongParameterValue");
         Map<Integer, SqlParameter> parameters = nextParameters.get();
         SqlParameter sqlPar = parameters.get(parameterIndex.intValue());
-        logNode.info("sqlPar: " + sqlPar);
         return sqlPar.getResultValue(Long.class);
 
     }
@@ -475,14 +303,14 @@ public class JdbcConnector {
     public void setInParameterObject(IMendixObject objectValue, String sqlType) {
         logNode.info("setInParameterObject");
         Map<Integer, SqlParameter> parameters = getParameters();
-        parameters.put(parameters.size() + 1, new SqlInParameterObject(parameters.size() + 1, SqlParameter.DIRECTION_IN, objectValue, sqlType));
+        parameters.put(parameters.size() + 1, new SqlParameterObject(parameters.size() + 1, SqlParameter.DIRECTION_IN, objectValue, sqlType));
 
     }
 
     public IMendixObject getObjectParameter(Long parameterIndex, String resultEntity) throws SQLException {
+        logNode.info("getObjectParameterValue");
         Map<Integer, SqlParameter> parameters = nextParameters.get();
         SqlParameter sqlPar = parameters.get(parameterIndex.intValue());
-        logNode.info("sqlPar: " + sqlPar);
         return sqlPar.getResultValue(IMendixObject.class);
     }
 }
