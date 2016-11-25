@@ -11,6 +11,7 @@ package oracleconnector.actions;
 
 import com.mendix.core.Core;
 import com.mendix.logging.ILogNode;
+import com.mendix.systemwideinterfaces.MendixRuntimeException;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.webui.CustomJavaAction;
 import oracleconnector.impl.JdbcConnector;
@@ -29,8 +30,12 @@ public class GetOutParameterString extends CustomJavaAction<java.lang.String>
 	public java.lang.String executeAction() throws Exception
 	{
 		// BEGIN USER CODE
-		//throw new com.mendix.systemwideinterfaces.MendixRuntimeException("Java action was not implemented");
-		return connector.getStringParameter(this.ParameterIndex);
+		try {
+			return connector.getStringParameter(this.ParameterIndex);
+		}catch(Exception e){
+			logNode.error(e.getMessage());
+			throw new MendixRuntimeException(e.getMessage());
+		}
 		// END USER CODE
 	}
 

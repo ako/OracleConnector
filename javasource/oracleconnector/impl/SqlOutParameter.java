@@ -1,9 +1,12 @@
 package oracleconnector.impl;
 
+import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
 
 import java.math.BigDecimal;
+import java.sql.CallableStatement;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -11,29 +14,15 @@ import java.util.List;
  */
 public class SqlOutParameter extends SqlParameter {
 
-
     private String stringValue = null;
     private String sqlTypeName = null;
     private String entityName = null;
-    //private String typeName = null;     // type of out parameter, String, Boolean, ...
     private List<IMendixObject> objectListResult;
-
-    public Date getDateTimeValue() {
-        return dateTimeValue;
-    }
-
-    public BigDecimal getDecimalValue() {
-        return decimalValue;
-    }
-
-    public Long getLongValue() {
-        return longValue;
-    }
-
     private Date dateTimeValue;
     private BigDecimal decimalValue;
     private Long longValue;
     private IMendixObject objectValue;
+
 
     /**
      *
@@ -104,8 +93,34 @@ public class SqlOutParameter extends SqlParameter {
 
         return this.objectValue;
     }
+    public Date getDateTimeValue() {
+        return dateTimeValue;
+    }
+
+    public BigDecimal getDecimalValue() {
+        return decimalValue;
+    }
+
+    public Long getLongValue() {
+        return longValue;
+    }
 
     public void setObjectValue(IMendixObject objectValue) {
         this.objectValue = objectValue;
+    }
+
+    @Override
+    public void prepareCall(IContext context, CallableStatement callableStatement) throws SQLException {
+
+    }
+
+    @Override
+    public void retrieveResult(IContext context, CallableStatement callableStatement) throws SQLException {
+
+    }
+
+    @Override
+    public <T> T getResultValue(Class<T> type) throws SQLException {
+        return null;
     }
 }

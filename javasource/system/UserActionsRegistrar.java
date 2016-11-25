@@ -44,7 +44,6 @@ public class UserActionsRegistrar implements EventHandler
 			component.actionRegistry().registerUserAction(oracleconnector.actions.ExecuteQuery.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.ExecuteStatement.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.GetDbmsOutput.class);
-			component.actionRegistry().registerUserAction(oracleconnector.actions.GetOutParameterBoolean.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.GetOutParameterDate.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.GetOutParameterDecimal.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.GetOutParameterLong.class);
@@ -53,13 +52,11 @@ public class UserActionsRegistrar implements EventHandler
 			component.actionRegistry().registerUserAction(oracleconnector.actions.GetOutParameterString.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.PlsqlCall.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.ResetParameters.class);
-			component.actionRegistry().registerUserAction(oracleconnector.actions.SetInParameterBoolean.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetInParameterDateTime.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetInParameterDecimal.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetInParameterLong.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetInParameterObject.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetInParameterString.class);
-			component.actionRegistry().registerUserAction(oracleconnector.actions.SetOutParametersBoolean.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetOutParametersDate.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetOutParametersDecimal.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetOutParametersLong.class);

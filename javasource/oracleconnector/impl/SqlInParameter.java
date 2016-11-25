@@ -1,5 +1,8 @@
 package oracleconnector.impl;
 
+import com.mendix.core.Core;
+import com.mendix.logging.ILogNode;
+import com.mendix.logging.impl.LogNode;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
 
 import java.math.BigDecimal;
@@ -9,7 +12,7 @@ import java.util.Date;
 /**
  * Created by ako on 18-11-2016.
  */
-public class SqlInParameter extends SqlParameter {
+public abstract class SqlInParameter extends SqlParameter {
     public String getSqlType() {
         return sqlType;
     }
@@ -20,10 +23,12 @@ public class SqlInParameter extends SqlParameter {
 
     private String sqlType;
     private BigDecimal decimalValue = null;
-    private String stringValue = null;
     private Date dateTimeValue = null;
     private Boolean booleanValue = null;
     private Long longValue = null;
+
+    public SqlInParameter() {
+    }
 
     public IMendixObject getMxObjectValue() {
         return mxObjectValue;
@@ -40,11 +45,12 @@ public class SqlInParameter extends SqlParameter {
         this.decimalValue = decimalValue;
     }
 
+    /*
     public SqlInParameter(String stringValue) {
         setParameterType(super.STRING_TYPE);
         this.stringValue = stringValue;
     }
-
+*/
     public SqlInParameter(Date dateTimeValue) {
         setParameterType(super.DATE_TIME_TYPE);
         this.dateTimeValue = dateTimeValue;
@@ -91,15 +97,6 @@ public class SqlInParameter extends SqlParameter {
     }
 
 
-    public String getStringValue() {
-        return stringValue;
-    }
-
-    public void setStringValue(String stringValue) {
-        this.stringValue = stringValue;
-    }
-
-
     public BigDecimal getDecimalValue() {
         return decimalValue;
     }
@@ -107,6 +104,9 @@ public class SqlInParameter extends SqlParameter {
     public void setDecimalValue(BigDecimal decimalValue) {
         this.decimalValue = decimalValue;
     }
+
+
+
 
 
 }

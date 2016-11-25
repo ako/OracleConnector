@@ -26,6 +26,54 @@ public class Microflows
 			throw new MendixRuntimeException(e);
 		}
 	}
+	public static void testAnonymousPlsqlCallBigDecimal(IContext context)
+	{
+		try
+		{
+			Map<java.lang.String, Object> params = new HashMap<java.lang.String, Object>();
+			Core.execute(context, "TestOracleConnector.TestAnonymousPlsqlCallBigDecimal", params);
+		}
+		catch (CoreException e)
+		{
+			throw new MendixRuntimeException(e);
+		}
+	}
+	public static void testAnonymousPlsqlCallDateTime(IContext context)
+	{
+		try
+		{
+			Map<java.lang.String, Object> params = new HashMap<java.lang.String, Object>();
+			Core.execute(context, "TestOracleConnector.TestAnonymousPlsqlCallDateTime", params);
+		}
+		catch (CoreException e)
+		{
+			throw new MendixRuntimeException(e);
+		}
+	}
+	public static void testAnonymousPlsqlCallLong(IContext context)
+	{
+		try
+		{
+			Map<java.lang.String, Object> params = new HashMap<java.lang.String, Object>();
+			Core.execute(context, "TestOracleConnector.TestAnonymousPlsqlCallLong", params);
+		}
+		catch (CoreException e)
+		{
+			throw new MendixRuntimeException(e);
+		}
+	}
+	public static void testAnonymousPlsqlCallString(IContext context)
+	{
+		try
+		{
+			Map<java.lang.String, Object> params = new HashMap<java.lang.String, Object>();
+			Core.execute(context, "TestOracleConnector.TestAnonymousPlsqlCallString", params);
+		}
+		catch (CoreException e)
+		{
+			throw new MendixRuntimeException(e);
+		}
+	}
 	public static void testAnonymousPlsqlCallTypes(IContext context)
 	{
 		try
@@ -68,6 +116,18 @@ public class Microflows
 		{
 			Map<java.lang.String, Object> params = new HashMap<java.lang.String, Object>();
 			Core.execute(context, "TestOracleConnector.TestRefCursor", params);
+		}
+		catch (CoreException e)
+		{
+			throw new MendixRuntimeException(e);
+		}
+	}
+	public static void testSqlArrayObjects(IContext context)
+	{
+		try
+		{
+			Map<java.lang.String, Object> params = new HashMap<java.lang.String, Object>();
+			Core.execute(context, "TestOracleConnector.TestSqlArrayObjects", params);
 		}
 		catch (CoreException e)
 		{
