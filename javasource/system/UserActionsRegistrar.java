@@ -48,6 +48,7 @@ public class UserActionsRegistrar implements EventHandler
 			component.actionRegistry().registerUserAction(oracleconnector.actions.GetOutParameterDecimal.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.GetOutParameterLong.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.GetOutParameterObject.class);
+			component.actionRegistry().registerUserAction(oracleconnector.actions.GetOutParameterObjectArray.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.GetOutParameterRefCursor.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.GetOutParameterString.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.PlsqlCall.class);
@@ -56,11 +57,13 @@ public class UserActionsRegistrar implements EventHandler
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetInParameterDecimal.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetInParameterLong.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetInParameterObject.class);
+			component.actionRegistry().registerUserAction(oracleconnector.actions.SetInParameterObjectArray.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetInParameterString.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetOutParametersDate.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetOutParametersDecimal.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetOutParametersLong.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetOutParametersObject.class);
+			component.actionRegistry().registerUserAction(oracleconnector.actions.SetOutParametersObjectArray.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetOutParametersRefCursor.class);
 			component.actionRegistry().registerUserAction(oracleconnector.actions.SetOutParametersString.class);
 			component.actionRegistry().registerUserAction(system.actions.VerifyPassword.class);

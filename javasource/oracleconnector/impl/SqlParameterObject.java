@@ -45,12 +45,11 @@ public class SqlParameterObject extends SqlParameter {
     public void prepareCall(IContext context, CallableStatement callableStatement) throws SQLException {
         logNode.info("prepareCall");
         if (isInParameter()) {
-//                        // Define a struct
+//          // Define a struct
             IMendixObject mxObj = this.getObjectValue();
             String sqlType = getSqlTypeName();
             logNode.info(String.format("Creating struct for %s, %s", mxObj, sqlType));
             List<? extends IMendixObjectMember<?>> objPrimitives = mxObj.getPrimitives(context);
-//
 
             StructDescriptor structdesc = StructDescriptor.createDescriptor
                     (this.getSqlTypeName(), (OracleConnection) callableStatement.getConnection().unwrap(OracleConnection.class));
@@ -60,39 +59,33 @@ public class SqlParameterObject extends SqlParameter {
                 logNode.warn(String.format("SQL object and entity have different attribute counts, %d != %d", structColumnCount, attributeCount));
             }
             logNode.info(String.format("attribute count %d", structColumnCount));
-//
+
             Object[] attrVals = new Object[attributeCount];
             Object[] objects = objPrimitives.toArray();
-//
+
             for (int mxa = 0; mxa < structColumnCount; mxa++) {
-                //IMendixObjectMember mem = ((IMendixObjectMember) objects[mxa]);
                 String colName = structdesc.getMetaData().getColumnName(mxa + 1);
                 IMendixObjectMember mem = mxObj.getMember(context, colName);
-//
+
                 logNode.info(String.format("getting attribute: %d, %s, %s", mxa,
                         mem.getValue(context).getClass().getName(),
                         mem.getValue(context)));
-//
+
                 if (mem.getValue(context) instanceof java.util.Date) {
                     attrVals[mxa] = new java.sql.Date(((Date) mem.getValue(context)).getTime());
-//
                 } else {
                     attrVals[mxa] = mem.getValue(context);
 
                 }
             }
             logNode.info(String.format("Struct array: %s", Arrays.toString(attrVals)));
-            //Struct objStruct = connection.createStruct(sqlType, attrVals);
-            //callableStatement.setObject(i, objStruct);
             OracleConnection oraConn = callableStatement.getConnection().unwrap(OracleConnection.class);
             StructDescriptor itemDescriptor =
                     StructDescriptor.createDescriptor(sqlType, oraConn);
             oracle.sql.STRUCT obj = new oracle.sql.STRUCT(itemDescriptor, oraConn, attrVals);
             OracleCallableStatement oraStmt = callableStatement.unwrap(OracleCallableStatement.class);
             oraStmt.setSTRUCT(getParameterIndex(), obj);
-
         } else {
-
             callableStatement.registerOutParameter(getParameterIndex(), OracleTypes.STRUCT, this.getSqlTypeName().toUpperCase());
         }
     }

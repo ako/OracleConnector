@@ -153,28 +153,31 @@ public class JdbcConnector {
 
             int i = 0;
             Map<Integer, SqlParameter> parameters = nextParameters.get();
-            Iterator<SqlParameter> parIterator = parameters.values().iterator();
+            if (parameters != null && !parameters.isEmpty()) {
+                Iterator<SqlParameter> parIterator = parameters.values().iterator();
 
-            while (parIterator.hasNext()) {
-                i++;
-                SqlParameter sqlPar = parIterator.next();
-                logNode.trace(String.format("Setting parameter: %d = %s", i, sqlPar));
-                sqlPar.prepareCall(context, callableStatement);
+                while (parIterator.hasNext()) {
+                    i++;
+                    SqlParameter sqlPar = parIterator.next();
+                    logNode.trace(String.format("Setting parameter: %d = %s", i, sqlPar));
+                    sqlPar.prepareCall(context, callableStatement);
+                }
             }
-
             logNode.trace("callableStatement: " + callableStatement.toString());
             callableStatement.executeUpdate();
 
             int j = 0;
-            Iterator<SqlParameter> outIterator = parameters.values().iterator();
+            if (parameters != null &&!parameters.isEmpty()) {
+                Iterator<SqlParameter> outIterator = parameters.values().iterator();
 
             /*
              * Get out parameters
              */
-            while (outIterator.hasNext()) {
-                j++;
-                SqlParameter sqlPar = outIterator.next();
-                sqlPar.retrieveResult(context, callableStatement);
+                while (outIterator.hasNext()) {
+                    j++;
+                    SqlParameter sqlPar = outIterator.next();
+                    sqlPar.retrieveResult(context, callableStatement);
+                }
             }
             return true;
         }
@@ -312,5 +315,18 @@ public class JdbcConnector {
         Map<Integer, SqlParameter> parameters = nextParameters.get();
         SqlParameter sqlPar = parameters.get(parameterIndex.intValue());
         return sqlPar.getResultValue(IMendixObject.class);
+    }
+
+    public void setInParameterObjectArray(List<IMendixObject> objectValue, String sqlType) {
+        logNode.info("setInParameterObjectArray");
+        Map<Integer, SqlParameter> parameters = getParameters();
+        parameters.put(parameters.size() + 1, new SqlParameterObjectArray(parameters.size() + 1, SqlParameter.DIRECTION_IN, objectValue, sqlType));
+    }
+
+    public void setOutParameterObjectArray(String entity, String sqlType) {
+        logNode.info("setInParameterObjectArray");
+        Map<Integer, SqlParameter> parameters = getParameters();
+        parameters.put(parameters.size() + 1, new SqlParameterObjectArray(parameters.size() + 1, SqlParameter.DIRECTION_OUT, entity, sqlType));
+
     }
 }
