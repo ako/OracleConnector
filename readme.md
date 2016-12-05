@@ -87,6 +87,7 @@ Apache 2.0 license
 ## Release history
 
 * 0.1 - Initial release
+* 0.2 - Cleanup and refactored parameter java code
 
  [1]: docs/images/plsql_string_par_mf.png
  [2]: docs/images/plsql_multiple_pars_mf.png
