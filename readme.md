@@ -41,7 +41,7 @@ The following plsql block returns a refcursor:
 
 You can use it in a microflow:
 
- ![Using a user defined SQL type in a plsql block][3]
+ ![Using a user defined SQL type in a plsql block][4]
 
 ### User defined SQL Types
 
@@ -68,7 +68,7 @@ We want to call the following plsql code:
       :2 := l_user;
     end;
 
- ![Reading from a refcursor in a plsql block][4]
+ ![Reading from a refcursor in a plsql block][3]
  
 ## Development
 
