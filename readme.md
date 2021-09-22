@@ -1,3 +1,5 @@
+Note: this connector is no longer required, the platform supported [Database Connector][6] now offers the same functionality.
+
 # Mendix Oracle Connector
 
 Mendix connector to easily connect to external Oracle databases.
@@ -94,3 +96,4 @@ Apache 2.0 license
  [3]: docs/images/sql_object_type_mf.png
  [4]: docs/images/plsql_refcursor_mf.png
  [5]: docs/images/sql_type_entity.png
+ [6]: https://marketplace.mendix.com/link/component/2888
